@@ -89,8 +89,13 @@ def call(Map configMap){
                     }
                 }
                 steps {
-                    build job: "../../${configMap.component}-deploy", wait : true, parameters: [string(name: 'version', value: "${packageVersion}"),
-                    string(name: 'environment', value: 'dev')]               
+                    script {
+                            def params = [
+                                string(name: 'version', value: "$packageVersion"),
+                                string(name: 'environment', value: "dev")
+                            ]
+                            build job: "../${configMap.component}-deploy", wait: true, parameters: params
+                        }              
                 }
             }
         }
