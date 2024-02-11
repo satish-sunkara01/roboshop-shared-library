@@ -48,7 +48,7 @@ def call(Map configMap){
             stage('Sonar Scanner') {
                 steps {
                     sh """
-                        // sonar-scanner
+                        echo "This must be run but now avoiding for cost optimization"
                         echo "Sonar Scan will run Here"
 
                     """
