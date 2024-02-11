@@ -7,7 +7,8 @@ def call(Map configMap){
         }
         environment { 
             packageVersion = ''
-            nexusURL = '172.31.5.163:8081'
+            // Placed Nexus url at pipeline Globals
+            // nexusURL = '172.31.5.163:8081'
         }
         options {
             timeout(time: 1, unit: 'HOURS')
@@ -55,7 +56,7 @@ def call(Map configMap){
                 steps {
                     sh """
                         ls -la
-                        zip -q -r catalogue.zip ./* -x ".git/" -x ".zip"
+                        zip -q -r ${configMap.component}.zip ./* -x ".git/" -x ".zip"
                         ls -ltr
                     """                
                 }
@@ -65,15 +66,15 @@ def call(Map configMap){
                     nexusArtifactUploader(
                             nexusVersion: 'nexus3',
                             protocol: 'http',
-                            nexusUrl: "${nexusURL}",
+                            nexusUrl: pipelineGlobals.nexusURL,
                             groupId: 'com.roboshop',
                             version: "${packageVersion}",
-                            repository: 'catalogue',
+                            repository: "${configMap.component}",
                             credentialsId: 'nexus-auth',
                             artifacts: [
-                                [artifactId: 'catalogue',
+                                [artifactId: "${configMap.component}",
                                 classifier: '',
-                                file: 'catalogue.zip',
+                                file: "${configMap.component}.zip",
                                 type: 'zip']
                             ]
                         )               
@@ -82,11 +83,11 @@ def call(Map configMap){
             stage('Deploy') {
                 when {
                     expression{
-                        params.Deploy == 'true'
+                        params.Deploy
                     }
                 }
                 steps {
-                    build job: 'catalogue-deploy', wait : true, parameters: [string(name: 'version', value: "${packageVersion}"),
+                    build job: "${configMap.component}-deploy", wait : true, parameters: [string(name: 'version', value: "${packageVersion}"),
                     string(name: 'environment', value: 'dev')]               
                 }
             }
