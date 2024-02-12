@@ -27,7 +27,7 @@ def call(Map configMap){
                     script{
                         def packageJson = readJSON file: 'package.json'
                         packageVersion = packageJson.version
-                        echo "Application Version : $packageVersion"
+                        echo "Application Version : ${packageVersion}"
                     }
                 }
             }
